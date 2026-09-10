@@ -4,7 +4,7 @@ import { Logo } from '@/components/ui/Logo'
 import { Panel } from '@/components/ui/Panel'
 import { Reveal } from '@/components/ui/Reveal'
 import { EXCHANGES } from '@/lib/markets'
-import { LandingCountdown } from './LandingCountdown'
+import { LandingCountdown } from '@/components/LandingCountdown'
 
 const STEPS = [
   {

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { SESSION_COOKIE } from '@/lib/auth/session'
+import { SESSION_COOKIE } from '@/lib/auth/cookieName'
 
 /**
  * Middleware runs on the Edge runtime, where `jsonwebtoken` is unavailable, so

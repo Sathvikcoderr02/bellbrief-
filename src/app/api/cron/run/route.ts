@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getEnv } from '@/lib/env'
-import { runNow, tick } from '@/lib/scheduler'
+import { runNow, tick } from '@/lib/scheduler/tick'
 
 export const maxDuration = 300
 

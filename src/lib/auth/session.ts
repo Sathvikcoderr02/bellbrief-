@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken'
 import { getEnv } from '@/lib/env'
+import { SESSION_MAX_AGE } from './cookieName'
 
-export const SESSION_COOKIE = 'bb_session'
-export const SESSION_MAX_AGE = 60 * 60 * 24 * 7
+export { SESSION_COOKIE, SESSION_MAX_AGE } from './cookieName'
 
 export function signSession(userId: string): string {
   return jwt.sign({ sub: userId }, getEnv().JWT_SECRET, {
