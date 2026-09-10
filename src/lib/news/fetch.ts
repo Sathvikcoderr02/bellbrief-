@@ -5,41 +5,55 @@ export type FeedFetcher = (url: string) => Promise<RawItem[]>
 
 const FEED_TIMEOUT_MS = 8_000
 
+/**
+ * `source` must be registered as a custom field — rss-parser drops it
+ * otherwise, and it is the only place Google News names the real publisher.
+ */
 const parser = new Parser({
   timeout: FEED_TIMEOUT_MS,
   headers: { 'User-Agent': 'Bellbrief/1.0 (pre-market news digest)' },
+  customFields: { item: [['source', 'sourceRaw']] },
 })
 
-type ParsedItem = {
+interface ParsedItem {
   title?: string
   link?: string
   isoDate?: string
   pubDate?: string
   content?: string
   contentSnippet?: string
-  source?: unknown
+  sourceRaw?: unknown
 }
 
-function resolveSource(item: ParsedItem, feedTitle: string | undefined, link: string): string {
-  const raw = item.source
+/**
+ * Attribution matters more here than in a normal reader: the source name is
+ * rendered as the proof chip beside every claim, so "Reuters" is useful and
+ * '"NVDA stock when:1d" - Google News' is worse than useless.
+ *
+ * Priority is publisher element, then link hostname, then the feed title —
+ * the feed title comes last because for a Google News search it is the query
+ * and for Yahoo it is the ticker page, neither of which is a publisher.
+ */
+export function resolveSource(item: ParsedItem, feedTitle: string | undefined, link: string): string {
+  const raw = item.sourceRaw
   if (typeof raw === 'string' && raw.trim()) return raw.trim()
   if (raw && typeof raw === 'object') {
-    const title = (raw as { title?: string }).title
-    if (title) return title
+    const title = (raw as { title?: string; _?: string }).title ?? (raw as { _?: string })._
+    if (typeof title === 'string' && title.trim()) return title.trim()
   }
-  if (feedTitle) return feedTitle
+
   try {
     return new URL(link).hostname.replace(/^www\./, '')
   } catch {
-    return 'unknown'
+    return feedTitle?.trim() || 'unknown'
   }
 }
 
 export const fetchFeed: FeedFetcher = async (url) => {
   const feed = await parser.parseURL(url)
 
-  return (feed.items ?? []).flatMap((raw) => {
-    const item = raw as ParsedItem
+  return (feed.items ?? []).flatMap((rawItem) => {
+    const item = rawItem as ParsedItem
     if (!item.title || !item.link) return []
 
     const stamp = item.isoDate ?? item.pubDate
@@ -60,7 +74,7 @@ export const fetchFeed: FeedFetcher = async (url) => {
   })
 }
 
-/** Bounded-parallelism map. Keeps a wide profile from opening 40 sockets at once. */
+/** Bounded-parallelism map, so a wide profile cannot open 40 sockets at once. */
 export async function mapWithConcurrency<T, R>(
   items: T[],
   limit: number,
