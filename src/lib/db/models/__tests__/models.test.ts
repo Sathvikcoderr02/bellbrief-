@@ -90,7 +90,8 @@ describe('DigestModel', () => {
 
   it('rejects an unknown status', async () => {
     await expect(
-      DigestModel.create({ userId: new mongoose.Types.ObjectId(), exchange: 'NSE', sessionDate: '2026-09-13', status: 'bogus', headline: 'h' }),
+      // Cast is deliberate: the point is to prove the schema rejects it at runtime.
+      DigestModel.create({ userId: new mongoose.Types.ObjectId(), exchange: 'NSE', sessionDate: '2026-09-13', status: 'bogus' as unknown as 'ready', headline: 'h' }),
     ).rejects.toThrow(/validation/i)
   })
 })
