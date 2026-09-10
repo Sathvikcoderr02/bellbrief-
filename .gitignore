@@ -1,0 +1,9 @@
+.superpowers/
+node_modules/
+.next/
+.env
+.env.local
+.mail/
+*.log
+.DS_Store
+coverage/
