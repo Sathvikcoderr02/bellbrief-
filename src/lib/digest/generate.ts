@@ -130,9 +130,28 @@ export async function generateDigest(input: {
       status: created.status,
       headline: created.headline,
       overview: created.overview,
-      narrative: created.narrative,
-      claims: created.claims,
-      articles: created.articles,
+      // Mongoose subdocuments type optional fields as `string | null`, while the
+      // mail layer works in plain `string | undefined`. Normalise at the seam
+      // rather than loosening the interface for everyone downstream.
+      narrative: created.narrative.map((sentence) => ({
+        text: sentence.text,
+        citations: [...sentence.citations],
+      })),
+      claims: created.claims.map((claim) => ({
+        claim: claim.claim,
+        sources: [...claim.sources],
+        agreement: claim.agreement,
+        confidence: claim.confidence,
+        note: claim.note ?? undefined,
+      })),
+      articles: created.articles.map((article) => ({
+        index: article.index,
+        articleId: article.articleId ?? undefined,
+        url: article.url,
+        title: article.title,
+        source: article.source,
+        publishedAt: article.publishedAt,
+      })),
       sentiment: created.sentiment,
       sessionDate,
     },
