@@ -138,7 +138,7 @@ export function OnboardingWizard({ options }: { options: WizardOptions }) {
 
   return (
     <main className="relative min-h-dvh">
-      <div className="bb-grid-bg pointer-events-none absolute inset-0 opacity-25" aria-hidden />
+      <div className="bb-grid-bg pointer-events-none absolute inset-0" aria-hidden />
 
       <div className="relative mx-auto max-w-3xl px-5 pt-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6 sm:pt-10">
         <div className="flex items-center justify-between">

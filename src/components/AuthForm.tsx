@@ -51,7 +51,7 @@ export function AuthForm({ mode, next }: { mode: 'login' | 'register'; next?: st
 
   return (
     <main className="relative flex min-h-dvh items-center justify-center px-5 py-10 sm:px-6 sm:py-12">
-      <div className="bb-grid-bg pointer-events-none absolute inset-0 opacity-30" aria-hidden />
+      <div className="bb-grid-bg pointer-events-none absolute inset-0" aria-hidden />
 
       <Panel className="relative w-full max-w-md p-6 sm:p-8">
         <Link href="/" className="inline-flex min-h-11 items-center">

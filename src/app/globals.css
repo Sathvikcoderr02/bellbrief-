@@ -22,6 +22,12 @@
      mode's own surface. The class order is load-bearing: lime adjacent to amber
      fails deuteranopia separation in dark mode (ΔE 5.9 against a floor of 6),
      and the grey sitting between them is what resolves it. */
+  /* The hairline grid gets its own token rather than borrowing --bb-border at
+     an opacity, which compounded to 1.048:1 — below what most displays resolve.
+     1.22:1 reads as structure without competing with the content; 1.54:1 was
+     tried and sat too loud. */
+  --bb-grid: #1b2320;
+
   --bb-claim-corroborated: #a8ff60;
   --bb-claim-single: #8d9a93;
   --bb-claim-disputed: #ffc24b;
@@ -58,6 +64,9 @@
      ΔE 10.6 here, below the normal-vision floor of 15. These clear it at 15.8
      with CVD separation 12.1. The discarded grey sits at 2.08:1, which the
      visible legend counts and the table view are the required relief for. */
+  /* 1.28:1, matching the dark mode's weight on a light ground. */
+  --bb-grid: #d8dedb;
+
   --bb-claim-corroborated: #2b7a12;
   --bb-claim-single: #46534b;
   --bb-claim-disputed: #c98400;
@@ -124,8 +133,8 @@ body {
 /* A single hairline grid at very low contrast: reads as a terminal, not decoration. */
 .bb-grid-bg {
   background-image:
-    linear-gradient(to right, var(--bb-border) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--bb-border) 1px, transparent 1px);
+    linear-gradient(to right, var(--bb-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bb-grid) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 

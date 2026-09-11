@@ -45,7 +45,7 @@ describe('brand constraints', () => {
     const css = readFileSync(path.join(SRC, 'app/globals.css'), 'utf8')
     for (const token of [
       '--bb-bg', '--bb-panel', '--bb-border', '--bb-text', '--bb-bright',
-      '--bb-muted', '--bb-faint', '--bb-accent', '--bb-amber', '--bb-red',
+      '--bb-muted', '--bb-faint', '--bb-accent', '--bb-amber', '--bb-red', '--bb-grid',
     ]) {
       expect(css).toContain(token)
     }

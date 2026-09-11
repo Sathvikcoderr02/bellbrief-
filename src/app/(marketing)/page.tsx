@@ -93,7 +93,7 @@ export default async function LandingPage() {
 
   return (
     <main className="relative overflow-hidden">
-      <div className="bb-grid-bg pointer-events-none absolute inset-0 opacity-30" aria-hidden />
+      <div className="bb-grid-bg pointer-events-none absolute inset-0" aria-hidden />
       {/* A single slow scanline over the grid, on the compositor. */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[40vh] overflow-hidden" aria-hidden>
         <div className="bb-scan h-24 w-full bg-gradient-to-b from-transparent via-bb-accent to-transparent opacity-[0.07]" />

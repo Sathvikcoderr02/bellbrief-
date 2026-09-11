@@ -13,7 +13,7 @@ import { SignOutButton } from './SignOutButton'
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative min-h-dvh">
-      <div className="bb-grid-bg pointer-events-none absolute inset-0 opacity-20" aria-hidden />
+      <div className="bb-grid-bg pointer-events-none absolute inset-0" aria-hidden />
 
       <header className="relative border-b border-bb-border">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center px-5 py-2.5 sm:px-6 sm:py-3">
