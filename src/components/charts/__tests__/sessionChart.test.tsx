@@ -39,9 +39,15 @@ describe('SessionChart', () => {
     expect(fills[2]).toBe('currentColor')
   })
 
-  it('marks the brief and the bell', () => {
+  it('draws a line for the brief and one for the bell', () => {
+    const { container } = render(<SessionChart slice={slice()} />)
+    expect(container.querySelector('[data-marker="brief"]')).toBeTruthy()
+    expect(container.querySelector('[data-marker="bell"]')).toBeTruthy()
+  })
+
+  it('leaves the brief line unlabelled, since the caption explains it', () => {
     render(<SessionChart slice={slice()} />)
-    expect(screen.getByText(/your brief/)).toBeInTheDocument()
+    expect(screen.queryByText(/your brief/)).toBeNull()
     expect(screen.getByText(/^bell/)).toBeInTheDocument()
   })
 
@@ -76,35 +82,20 @@ describe('SessionChart', () => {
     // markers were laid out by timestamp, so the brief — an hour before the
     // first bar — clamped to the left edge and sat on top of the bell label.
     const { container } = render(<SessionChart slice={slice()} />)
-    const xOf = (label: string) =>
-      Number(
-        [...container.querySelectorAll('text')]
-          .find((node) => node.textContent?.startsWith(label))!
-          .getAttribute('x'),
-      )
+    const xOf = (name: string) =>
+      Number(container.querySelector(`[data-marker="${name}"] line`)!.getAttribute('x1'))
     const firstCandle = Number(container.querySelector('rect')!.getAttribute('x'))
 
-    expect(xOf('your brief')).toBeLessThan(xOf('bell'))
-    expect(xOf('your brief')).toBeLessThan(firstCandle)
-  })
-
-  it('keeps the two marker labels on different rows so they cannot collide', () => {
-    const { container } = render(<SessionChart slice={slice()} />)
-    const yOf = (label: string) =>
-      Number(
-        [...container.querySelectorAll('text')]
-          .find((node) => node.textContent?.startsWith(label))!
-          .getAttribute('y'),
-      )
-    expect(Math.abs(yOf('your brief') - yOf('bell'))).toBeGreaterThan(20)
+    expect(xOf('brief')).toBeLessThan(xOf('bell'))
+    expect(xOf('brief')).toBeLessThan(firstCandle)
   })
 
   it('anchors a right-hand marker to the end so its label stays inside the box', () => {
     // A brief close to the end of the plotted range must not run off the edge.
-    const late = slice({ briefIso: '2026-09-11T04:15:00.000Z', openIso: '2026-09-11T04:15:00.000Z' })
+    const late = slice({ openIso: '2026-09-11T04:15:00.000Z' })
     const { container } = render(<SessionChart slice={late} />)
     const node = [...container.querySelectorAll('text')].find((n) =>
-      n.textContent?.startsWith('your brief'),
+      n.textContent?.startsWith('bell'),
     )!
     expect(node.getAttribute('text-anchor')).toBe('end')
   })

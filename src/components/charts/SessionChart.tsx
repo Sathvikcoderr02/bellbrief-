@@ -199,20 +199,21 @@ export function SessionChart({ slice }: { slice: SessionSlice }) {
         })}
 
         {/* The brief, then the bell. */}
-        {/* The brief's label rides the top of the plot and the bell's the bottom:
-            an hour apart on this scale is only ~10% of the width, far less than
-            either label needs, so vertical separation is the only thing that
-            keeps them apart at every session length. */}
+        {/* The brief's line carries no label. An hour is only ~10% of the axis
+            width, far less than the text needs, and the caption beneath the
+            chart already says what the accent line marks. Only the bell is
+            labelled, at the foot of the plot. */}
         {[
-          { iso: slice.briefIso, label: 'your brief', accent: true, top: true },
-          { iso: slice.openIso, label: 'bell', accent: false, top: false },
+          { name: 'brief', iso: slice.briefIso, label: null, accent: true, top: true },
+          { name: 'bell', iso: slice.openIso, label: 'bell', accent: false, top: false },
         ].map((marker) => {
           const x = geometry.xAt(marker.iso)
           // Flip the anchor near the right edge so a label cannot run off.
           const flip = x > PAD.left + geometry.plotW * 0.72
           return (
             <motion.g
-              key={marker.label}
+              key={marker.name}
+              data-marker={marker.name}
               initial={reduced ? false : { opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -229,14 +230,16 @@ export function SessionChart({ slice }: { slice: SessionSlice }) {
                 strokeDasharray={marker.accent ? undefined : '2 3'}
                 opacity={marker.accent ? 0.8 : 0.5}
               />
-              <text
-                x={flip ? x - 4 : x + 4}
-                y={marker.top ? PAD.top + 9 : H - PAD.bottom + 11}
-                textAnchor={flip ? 'end' : 'start'}
-                className={`font-mono text-[11px] ${marker.accent ? 'fill-bb-accent' : 'fill-bb-muted'}`}
-              >
-                {marker.label} {localTime(marker.iso)}
-              </text>
+              {marker.label ? (
+                <text
+                  x={flip ? x - 4 : x + 4}
+                  y={marker.top ? PAD.top + 9 : H - PAD.bottom + 11}
+                  textAnchor={flip ? 'end' : 'start'}
+                  className={`font-mono text-[11px] ${marker.accent ? 'fill-bb-accent' : 'fill-bb-muted'}`}
+                >
+                  {marker.label} {localTime(marker.iso)}
+                </text>
+              ) : null}
             </motion.g>
           )
         })}
