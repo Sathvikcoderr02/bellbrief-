@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { DIGEST_LEAD_MINUTES } from '../clock'
 import { EXCHANGES } from '../exchanges'
-import { nextDistinctBells } from '../upcoming'
+import { nextBellGroups, nextDistinctBells } from '../upcoming'
 
 // A Monday, mid-morning UTC, so several bells are still ahead of it.
 const MONDAY = new Date('2026-09-14T12:00:00Z')
@@ -41,6 +41,36 @@ describe('nextDistinctBells', () => {
       expect(exchange).toBeDefined()
       expect(bell.openLocal).toBe(exchange!.openLocal)
       expect(bell.zone).toBe(exchange!.timeZone)
+    }
+  })
+})
+
+describe('nextBellGroups', () => {
+  it('groups exchanges that ring at the same instant', () => {
+    const groups = nextBellGroups(MONDAY)
+    const withNy = groups.find((group) => group.members.some((m) => m.code === 'NASDAQ'))
+    expect(withNy!.members.map((m) => m.code).sort()).toEqual(['NASDAQ', 'NYSE', 'TSX'])
+  })
+
+  it('groups the Indian exchanges together', () => {
+    const groups = nextBellGroups(MONDAY)
+    const india = groups.find((group) => group.members.some((m) => m.code === 'NSE'))
+    expect(india!.members.map((m) => m.code).sort()).toEqual(['BSE', 'NSE'])
+  })
+
+  it('accounts for every exchange exactly once', () => {
+    const codes = nextBellGroups(MONDAY).flatMap((group) => group.members.map((m) => m.code))
+    expect(codes.sort()).toEqual(EXCHANGES.map((e) => e.code).sort())
+  })
+
+  it('orders groups soonest first', () => {
+    const times = nextBellGroups(MONDAY).map((group) => Date.parse(group.openIso))
+    expect(times).toEqual([...times].sort((a, b) => a - b))
+  })
+
+  it('puts the brief one lead time before each grouped bell', () => {
+    for (const group of nextBellGroups(MONDAY)) {
+      expect(Date.parse(group.openIso) - Date.parse(group.briefIso)).toBe(DIGEST_LEAD_MINUTES * 60_000)
     }
   })
 })

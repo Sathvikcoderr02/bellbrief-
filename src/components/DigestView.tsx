@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
 import type { DigestClaim, NarrativeSentence } from '@/lib/db/models'
+import { ClaimMix } from './charts/ClaimMix'
 import { ClaimLedger } from './ClaimLedger'
 
 export interface DigestViewArticle {
@@ -147,7 +148,10 @@ export function DigestView({ digest }: { digest: DigestViewModel }) {
               ) : null}
             </div>
           ) : (
-            <ClaimLedger claims={digest.claims} articles={digest.articles} />
+            <div>
+              <ClaimMix claims={digest.claims} />
+              <ClaimLedger claims={digest.claims} articles={digest.articles} />
+            </div>
           )}
         </motion.div>
       </AnimatePresence>

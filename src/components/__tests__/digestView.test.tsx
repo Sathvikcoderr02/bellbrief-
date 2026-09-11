@@ -83,7 +83,11 @@ describe('DigestView', () => {
     render(<DigestView digest={digest} />)
     fireEvent.click(screen.getByRole('tab', { name: /proof/i }))
     await waitFor(() => expect(screen.getByText('INFY to crash 20%')).toBeInTheDocument())
-    expect(screen.getByText(/discarded/i)).toBeInTheDocument()
+    // Struck through in the ledger rather than merely labelled somewhere: the
+    // claim-mix chart above also names the class, so a loose text query would
+    // now pass without the rejected claim being shown at all.
+    expect(screen.getByText('INFY to crash 20%')).toHaveClass('line-through')
+    expect(screen.getByText('unsourced blog')).toBeInTheDocument()
   })
 
   it('renders proof source chips as links to the article', async () => {

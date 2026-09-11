@@ -25,24 +25,59 @@ export interface UpcomingBell {
  * actually looking at, rather than the zone name.
  */
 export function nextDistinctBells(limit: number, now: Date = new Date()): UpcomingBell[] {
-  const seen = new Set<number>()
-
-  return EXCHANGES.map((exchange) => ({ exchange, ...nextSessionOpen(exchange, now) }))
-    .sort((a, b) => a.openInstant.getTime() - b.openInstant.getTime())
-    .filter(({ openInstant }) => {
-      const bell = openInstant.getTime()
-      if (seen.has(bell)) return false
-      seen.add(bell)
-      return true
-    })
+  return nextBellGroups(now)
     .slice(0, limit)
-    .map(({ exchange, sessionDate, openInstant }) => ({
+    .map((group) => ({ ...group.members[0], sessionDate: group.sessionDate, openIso: group.openIso, briefIso: group.briefIso }))
+}
+
+export interface BellMember {
+  code: string
+  label: string
+  zone: string
+  openLocal: string
+}
+
+export interface BellGroup {
+  /** Absolute instant every member of this group opens at. */
+  openIso: string
+  /** Absolute instant the brief is sent for this bell. */
+  briefIso: string
+  sessionDate: string
+  /** Every exchange ringing at this instant, in registry order. */
+  members: BellMember[]
+}
+
+/**
+ * Every exchange's next open, grouped by the instant it happens, soonest first.
+ *
+ * Grouping rather than discarding matters for the timeline: NASDAQ, NYSE and
+ * Toronto all ring together, and a reader wants to see all three named on the
+ * one mark rather than have two of them silently dropped.
+ */
+export function nextBellGroups(now: Date = new Date()): BellGroup[] {
+  const groups = new Map<number, BellGroup>()
+
+  for (const exchange of EXCHANGES) {
+    const { sessionDate, openInstant } = nextSessionOpen(exchange, now)
+    const key = openInstant.getTime()
+
+    const group =
+      groups.get(key) ??
+      {
+        openIso: openInstant.toISOString(),
+        briefIso: new Date(key - DIGEST_LEAD_MINUTES * 60_000).toISOString(),
+        sessionDate,
+        members: [],
+      }
+
+    group.members.push({
       code: exchange.code,
       label: exchange.label,
       zone: exchange.timeZone,
       openLocal: exchange.openLocal,
-      sessionDate,
-      openIso: openInstant.toISOString(),
-      briefIso: new Date(openInstant.getTime() - DIGEST_LEAD_MINUTES * 60_000).toISOString(),
-    }))
+    })
+    groups.set(key, group)
+  }
+
+  return [...groups.entries()].sort(([a], [b]) => a - b).map(([, group]) => group)
 }

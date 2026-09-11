@@ -18,6 +18,15 @@
   --bb-amber: #ffc24b;
   --bb-red: #ff5c5c;
 
+  /* Claim-class fills, validated with the dataviz palette checker against each
+     mode's own surface. The class order is load-bearing: lime adjacent to amber
+     fails deuteranopia separation in dark mode (ΔE 5.9 against a floor of 6),
+     and the grey sitting between them is what resolves it. */
+  --bb-claim-corroborated: #a8ff60;
+  --bb-claim-single: #8d9a93;
+  --bb-claim-disputed: #ffc24b;
+  --bb-claim-discarded: #5c6b64;
+
   --bb-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
   --bb-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
@@ -40,6 +49,15 @@
   --bb-amber: #8a5a10;
   --bb-red: #b52626;
 
+  /* Re-stepped for a white surface rather than flipped: the dark steps score
+     ΔE 10.6 here, below the normal-vision floor of 15. These clear it at 15.8
+     with CVD separation 12.1. The discarded grey sits at 2.08:1, which the
+     visible legend counts and the table view are the required relief for. */
+  --bb-claim-corroborated: #2b7a12;
+  --bb-claim-single: #46534b;
+  --bb-claim-disputed: #c98400;
+  --bb-claim-discarded: #aab7b0;
+
   color-scheme: light;
 }
 
@@ -56,6 +74,10 @@
   --color-bb-accent-dim: var(--bb-accent-dim);
   --color-bb-amber: var(--bb-amber);
   --color-bb-red: var(--bb-red);
+  --color-bb-claim-corroborated: var(--bb-claim-corroborated);
+  --color-bb-claim-single: var(--bb-claim-single);
+  --color-bb-claim-disputed: var(--bb-claim-disputed);
+  --color-bb-claim-discarded: var(--bb-claim-discarded);
   --font-mono: var(--bb-mono);
   --font-sans: var(--bb-sans);
 }

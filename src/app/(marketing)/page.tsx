@@ -5,8 +5,9 @@ import { Logo } from '@/components/ui/Logo'
 import { Panel } from '@/components/ui/Panel'
 import { Reveal } from '@/components/ui/Reveal'
 import { Stagger, StaggerItem } from '@/components/ui/Stagger'
-import { EXCHANGES, getExchange, nextDistinctBells } from '@/lib/markets'
+import { EXCHANGES, getExchange, nextBellGroups, nextDistinctBells } from '@/lib/markets'
 import { SECTORS, THEMES } from '@/lib/news'
+import { BellTimeline } from '@/components/charts/BellTimeline'
 import { LandingCountdown } from '@/components/LandingCountdown'
 
 /**
@@ -60,6 +61,7 @@ const PIPELINE = [
 
 export default function LandingPage() {
   const markets = nextDistinctBells(3)
+  const bells = nextBellGroups()
 
   return (
     <main className="relative overflow-hidden">
@@ -149,6 +151,14 @@ export default function LandingPage() {
             </Reveal>
           ))}
         </div>
+      </section>
+
+      <section className="relative mx-auto max-w-6xl px-5 pb-16 sm:px-6 md:pb-20">
+        <Reveal>
+          <Panel className="p-5 sm:p-6 md:p-8">
+            <BellTimeline groups={bells} />
+          </Panel>
+        </Reveal>
       </section>
 
       <section className="relative mx-auto max-w-6xl px-5 pb-20 sm:px-6 md:pb-24">
