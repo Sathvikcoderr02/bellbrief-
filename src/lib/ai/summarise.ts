@@ -1,6 +1,6 @@
 import type { CollectedArticle } from '@/lib/news'
 import { generateWithGemini, type Generate } from './gemini'
-import { buildDigestPrompt, PROMPT_VERSION, type PromptProfile } from './prompt'
+import { buildDigestPrompt, PROMPT_VERSION, type PromptContext, type PromptProfile } from './prompt'
 import { GEMINI_MODEL } from './schema'
 import { validateCitations, type RawDigest } from './validate'
 
@@ -42,7 +42,13 @@ function degradedDigest(articles: CollectedArticle[]): RawDigest {
 export async function summarise(
   articles: CollectedArticle[],
   profile: PromptProfile,
-  opts: { generate?: Generate; retries?: number; retryDelayMs?: number } = {},
+  opts: {
+    generate?: Generate
+    retries?: number
+    retryDelayMs?: number
+    /** Defaults to now, which is correct for an immediate run. */
+    context?: Partial<PromptContext>
+  } = {},
 ): Promise<SummariseResult> {
   const base = { model: GEMINI_MODEL, promptVersion: PROMPT_VERSION, droppedSentences: 0 }
 
@@ -57,7 +63,11 @@ export async function summarise(
   const generate = opts.generate ?? generateWithGemini
   const retries = opts.retries ?? 2
   const retryDelayMs = opts.retryDelayMs ?? 1_500
-  const prompt = buildDigestPrompt(articles, profile)
+  const prompt = buildDigestPrompt(articles, profile, {
+    digestInstant: opts.context?.digestInstant ?? new Date(),
+    sessionDate: opts.context?.sessionDate,
+    openLocal: opts.context?.openLocal,
+  })
 
   let lastError = 'unknown error'
 

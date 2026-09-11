@@ -3,6 +3,8 @@ export interface RawItem {
   link: string
   source: string
   publishedAt: Date
+  /** True when the feed gave no date and `publishedAt` is only "when we saw it". */
+  publishedAtEstimated?: boolean
   snippet: string
 }
 

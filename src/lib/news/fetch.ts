@@ -56,6 +56,9 @@ export const fetchFeed: FeedFetcher = async (url) => {
     const item = rawItem as ParsedItem
     if (!item.title || !item.link) return []
 
+    // Some feeds omit a date entirely. Defaulting to now keeps the item, but
+    // it must be flagged: the summariser weighs recency, and an undated article
+    // would otherwise look like the freshest thing in the corpus.
     const stamp = item.isoDate ?? item.pubDate
     const publishedAt = stamp ? new Date(stamp) : new Date()
     if (Number.isNaN(publishedAt.getTime())) return []
@@ -65,6 +68,7 @@ export const fetchFeed: FeedFetcher = async (url) => {
       link: item.link,
       source: resolveSource(item, feed.title, item.link),
       publishedAt,
+      ...(stamp ? {} : { publishedAtEstimated: true as const }),
       snippet: (item.contentSnippet ?? item.content ?? '')
         .replace(/<[^>]+>/g, ' ')
         .replace(/\s+/g, ' ')

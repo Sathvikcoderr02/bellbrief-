@@ -16,6 +16,8 @@ export interface CollectedArticle {
   title: string
   source: string
   publishedAt: Date
+  /** True when the feed gave no date, so the timestamp is only an estimate. */
+  publishedAtEstimated?: boolean
   snippet: string
   matchedTickers: string[]
   matchedSectors: string[]
@@ -64,6 +66,7 @@ export async function collectArticles(
         title: item.title,
         source: item.source,
         publishedAt: item.publishedAt,
+        ...(item.publishedAtEstimated ? { publishedAtEstimated: true } : {}),
         snippet: item.snippet,
         matchedTickers,
         matchedSectors,

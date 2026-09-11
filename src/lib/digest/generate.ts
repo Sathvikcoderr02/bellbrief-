@@ -59,15 +59,19 @@ export async function generateDigest(input: {
     { since },
   )
 
-  const result = await summarise(articles, {
-    experienceLevel: profile.experienceLevel,
-    tickers: profile.tickers,
-    sectors: profile.sectors,
-    themes: profile.themes,
-    exchanges: [exchange],
-    riskAppetite: profile.riskAppetite,
-    horizon: profile.horizon,
-  })
+  const result = await summarise(
+    articles,
+    {
+      experienceLevel: profile.experienceLevel,
+      tickers: profile.tickers,
+      sectors: profile.sectors,
+      themes: profile.themes,
+      exchanges: [exchange],
+      riskAppetite: profile.riskAppetite,
+      horizon: profile.horizon,
+    },
+    { context: { digestInstant, sessionDate, openLocal: exchangeInfo.openLocal } },
+  )
 
   // Persist articles for reuse across users, then build the index -> article map
   // the digest renders its citations from.
