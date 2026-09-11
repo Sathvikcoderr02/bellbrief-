@@ -4,10 +4,14 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { useMemo } from 'react'
 import type { SessionSlice } from '@/lib/market/session'
 
-/** Drawing box. The SVG scales to its container, so these are ratios, not pixels. */
-const W = 720
-const H = 260
-const PAD = { top: 16, right: 54, bottom: 26, left: 8 }
+/**
+ * Drawing box, sized for the hero's right-hand column (~490px at the widest
+ * breakpoint) so the SVG renders close to 1:1 and its labels keep their
+ * intended size instead of being scaled into illegibility.
+ */
+const W = 500
+const H = 250
+const PAD = { top: 14, right: 52, bottom: 26, left: 6 }
 
 const pct = (value: number) => `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`
 
@@ -90,7 +94,7 @@ export function SessionChart({ slice }: { slice: SessionSlice }) {
       <div className="-mx-1 mt-3 overflow-x-auto px-1">
       <svg
         viewBox={`0 0 ${W} ${H}`}
-        className="h-auto w-full min-w-[34rem]"
+        className="h-auto w-full min-w-[26rem]"
         role="img"
         aria-label={`${slice.name}, ${slice.sessionDate}: opened ${pct(slice.gapPercent)} against the previous close of ${slice.previousClose}, and stood ${pct(slice.changePercent)} at the latest print. The brief was sent at ${localTime(slice.briefIso)}, one hour before the ${localTime(slice.openIso)} open.`}
       >
@@ -108,7 +112,7 @@ export function SessionChart({ slice }: { slice: SessionSlice }) {
         <text
           x={W - PAD.right + 6}
           y={geometry.y(slice.previousClose) + 3}
-          className="fill-bb-faint font-mono text-[9px]"
+          className="fill-bb-faint font-mono text-[11px]"
         >
           prev {slice.previousClose.toFixed(0)}
         </text>
@@ -120,7 +124,7 @@ export function SessionChart({ slice }: { slice: SessionSlice }) {
               key={price}
               x={W - PAD.right + 6}
               y={geometry.y(price) + 3}
-              className="fill-bb-faint font-mono text-[9px]"
+              className="fill-bb-faint font-mono text-[11px]"
             >
               {price.toFixed(0)}
             </text>
@@ -195,7 +199,7 @@ export function SessionChart({ slice }: { slice: SessionSlice }) {
               <text
                 x={x + 4}
                 y={H - PAD.bottom + 10}
-                className={`font-mono text-[9px] ${marker.accent ? 'fill-bb-accent' : 'fill-bb-muted'}`}
+                className={`font-mono text-[11px] ${marker.accent ? 'fill-bb-accent' : 'fill-bb-muted'}`}
               >
                 {marker.label} {localTime(marker.iso)}
               </text>

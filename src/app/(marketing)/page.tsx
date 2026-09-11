@@ -99,9 +99,9 @@ export default async function LandingPage() {
         <div className="bb-scan h-24 w-full bg-gradient-to-b from-transparent via-bb-accent to-transparent opacity-[0.07]" />
       </div>
 
-      <header className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-4 sm:px-6 sm:py-6">
+      <header className="relative mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-5 py-4 sm:px-6 sm:py-6">
         <Logo />
-        <nav className="flex items-center gap-1 sm:gap-4">
+        <nav className="ml-auto flex items-center gap-1 sm:gap-4">
           <ThemeToggle />
           {/* Below sm this would crowd the row; the hero's second button is the
               same destination, so nothing is lost. */}
@@ -120,7 +120,8 @@ export default async function LandingPage() {
         </nav>
       </header>
 
-      <section className="relative mx-auto max-w-6xl px-5 pb-16 pt-10 sm:px-6 md:pb-20 md:pt-24">
+      <section className="relative mx-auto max-w-6xl px-5 pb-16 pt-10 sm:px-6 md:pb-20 md:pt-20">
+        <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
         <Stagger>
           <StaggerItem>
             <p className="bb-label mb-4 sm:mb-5">
@@ -162,39 +163,25 @@ export default async function LandingPage() {
           </StaggerItem>
         </Stagger>
 
-        <Reveal delay={0.28} className="mt-10 sm:mt-14">
-          <LandingCountdown markets={markets} />
-        </Reveal>
-      </section>
-
-      {session ? (
-        <section className="relative mx-auto max-w-6xl px-5 pb-16 sm:px-6 md:pb-20">
-          <Reveal>
-            <Panel className="p-5 sm:p-6 md:p-8">
-              <p className="bb-label">What the hour is worth</p>
-              <h2 className="mt-3 max-w-2xl text-xl font-semibold leading-tight text-bb-bright sm:text-2xl">
-                The overnight news is already in the opening print.
-              </h2>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-bb-muted">
-                A market does not open where it closed. Everything published while the exchange slept
-                arrives at once, in the first candle — the jump from the dashed line below. Bellbrief
-                puts that news in front of you sixty minutes earlier, so the gap is something you
-                understood rather than something that happened to you.
-              </p>
-
-              <div className="mt-7">
-                <SessionChart slice={session} />
-              </div>
-
-              <p className="mt-5 text-[11px] leading-relaxed text-bb-faint">
-                Real prices for {session.name} from Yahoo Finance, {session.sessionDate} session, shown
-                to illustrate when the brief arrives relative to the bell. Past prices are not a
+        {session ? (
+          <Reveal delay={0.18}>
+            <Panel className="p-4 sm:p-5">
+              <SessionChart slice={session} />
+              <p className="mt-4 border-t border-bb-border pt-3.5 text-[11px] leading-relaxed text-bb-faint">
+                A market does not open where it closed. The jump from the dashed line is everything
+                published while the exchange slept, priced in at once — and your brief lands an hour
+                before it. Real {session.name} prices from Yahoo Finance; past prices are not a
                 forecast, and nothing here is investment advice.
               </p>
             </Panel>
           </Reveal>
-        </section>
-      ) : null}
+        ) : null}
+        </div>
+
+        <Reveal delay={0.28} className="mt-10 sm:mt-14">
+          <LandingCountdown markets={markets} />
+        </Reveal>
+      </section>
 
       <section className="relative mx-auto max-w-6xl px-5 pb-16 sm:px-6 md:pb-20">
         <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
