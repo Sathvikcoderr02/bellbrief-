@@ -43,16 +43,43 @@ export function SessionChart({ slice }: { slice: SessionSlice }) {
     const plotH = H - PAD.top - PAD.bottom
 
     const y = (price: number) => PAD.top + ((high - price) / span) * plotH
-    const step = plotW / slice.bars.length
-    const bodyW = Math.max(1.5, Math.min(11, step * 0.62))
 
-    const first = Date.parse(slice.bars[0].t)
-    const last = Date.parse(slice.bars[slice.bars.length - 1].t)
-    const timeSpan = last - first || 1
-    const xAt = (iso: string) =>
-      PAD.left + ((Date.parse(iso) - first) / timeSpan) * (plotW - step) + step / 2
+    /**
+     * One scale, in time, for candles and markers alike. Positioning bars by
+     * array index while positioning the markers by timestamp put two different
+     * scales on one axis, and left the brief — which happens an hour before the
+     * first bar — with nowhere to sit but clamped on top of the opening bell.
+     *
+     * The domain therefore starts at the brief, not at the open: that leading
+     * hour of empty space is the whole point of the picture.
+     */
+    const domainStart = Math.min(Date.parse(slice.briefIso), Date.parse(slice.bars[0].t))
+    const domainEnd = Math.max(
+      Date.parse(slice.bars[slice.bars.length - 1].t),
+      Date.parse(slice.openIso),
+    )
+    const domainSpan = domainEnd - domainStart || 1
 
-    return { low, high, span, y, step, bodyW, xAt, plotW, plotH }
+    // Bar width from the real sampling interval, so candles neither overlap nor
+    // float apart when a session is short.
+    const gaps = slice.bars
+      .slice(1)
+      .map((bar, index) => Date.parse(bar.t) - Date.parse(slice.bars[index].t))
+      .sort((a, b) => a - b)
+    const interval = gaps.length > 0 ? gaps[Math.floor(gaps.length / 2)] : 900_000
+    const bodyW = Math.max(1.5, Math.min(10, (interval / domainSpan) * plotW * 0.62))
+
+    // Map into a range already inset by half a body, rather than clamping after
+    // the fact: clamping pulled the final candle inward and made the last gap
+    // narrower than the rest, so evenly sampled bars stopped looking evenly
+    // spaced.
+    const inner = Math.max(1, plotW - bodyW)
+    const xAt = (iso: string) => {
+      const ratio = (Date.parse(iso) - domainStart) / domainSpan
+      return PAD.left + bodyW / 2 + Math.max(0, Math.min(1, ratio)) * inner
+    }
+
+    return { low, high, span, y, bodyW, xAt, plotW, plotH }
   }, [slice])
 
   /**
@@ -131,7 +158,7 @@ export function SessionChart({ slice }: { slice: SessionSlice }) {
           ))}
 
         {slice.bars.map((bar, index) => {
-          const x = PAD.left + index * geometry.step + geometry.step / 2
+          const x = geometry.xAt(bar.t)
           const rising = bar.c >= bar.o
           const top = geometry.y(Math.max(bar.o, bar.c))
           const bottom = geometry.y(Math.min(bar.o, bar.c))
@@ -172,11 +199,17 @@ export function SessionChart({ slice }: { slice: SessionSlice }) {
         })}
 
         {/* The brief, then the bell. */}
+        {/* The brief's label rides the top of the plot and the bell's the bottom:
+            an hour apart on this scale is only ~10% of the width, far less than
+            either label needs, so vertical separation is the only thing that
+            keeps them apart at every session length. */}
         {[
-          { iso: slice.briefIso, label: 'your brief', accent: true },
-          { iso: slice.openIso, label: 'bell', accent: false },
+          { iso: slice.briefIso, label: 'your brief', accent: true, top: true },
+          { iso: slice.openIso, label: 'bell', accent: false, top: false },
         ].map((marker) => {
-          const x = Math.max(PAD.left, Math.min(W - PAD.right, geometry.xAt(marker.iso)))
+          const x = geometry.xAt(marker.iso)
+          // Flip the anchor near the right edge so a label cannot run off.
+          const flip = x > PAD.left + geometry.plotW * 0.72
           return (
             <motion.g
               key={marker.label}
@@ -197,8 +230,9 @@ export function SessionChart({ slice }: { slice: SessionSlice }) {
                 opacity={marker.accent ? 0.8 : 0.5}
               />
               <text
-                x={x + 4}
-                y={H - PAD.bottom + 10}
+                x={flip ? x - 4 : x + 4}
+                y={marker.top ? PAD.top + 9 : H - PAD.bottom + 11}
+                textAnchor={flip ? 'end' : 'start'}
                 className={`font-mono text-[11px] ${marker.accent ? 'fill-bb-accent' : 'fill-bb-muted'}`}
               >
                 {marker.label} {localTime(marker.iso)}

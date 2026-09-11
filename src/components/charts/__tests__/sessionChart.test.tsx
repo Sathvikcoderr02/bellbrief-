@@ -71,6 +71,52 @@ describe('SessionChart', () => {
     expect(screen.getAllByRole('row')).toHaveLength(4) // header + 3 bars
   })
 
+  it('places the brief strictly left of the opening bell and the first candle', () => {
+    // The regression this guards: bars were laid out by array index while the
+    // markers were laid out by timestamp, so the brief — an hour before the
+    // first bar — clamped to the left edge and sat on top of the bell label.
+    const { container } = render(<SessionChart slice={slice()} />)
+    const xOf = (label: string) =>
+      Number(
+        [...container.querySelectorAll('text')]
+          .find((node) => node.textContent?.startsWith(label))!
+          .getAttribute('x'),
+      )
+    const firstCandle = Number(container.querySelector('rect')!.getAttribute('x'))
+
+    expect(xOf('your brief')).toBeLessThan(xOf('bell'))
+    expect(xOf('your brief')).toBeLessThan(firstCandle)
+  })
+
+  it('keeps the two marker labels on different rows so they cannot collide', () => {
+    const { container } = render(<SessionChart slice={slice()} />)
+    const yOf = (label: string) =>
+      Number(
+        [...container.querySelectorAll('text')]
+          .find((node) => node.textContent?.startsWith(label))!
+          .getAttribute('y'),
+      )
+    expect(Math.abs(yOf('your brief') - yOf('bell'))).toBeGreaterThan(20)
+  })
+
+  it('anchors a right-hand marker to the end so its label stays inside the box', () => {
+    // A brief close to the end of the plotted range must not run off the edge.
+    const late = slice({ briefIso: '2026-09-11T04:15:00.000Z', openIso: '2026-09-11T04:15:00.000Z' })
+    const { container } = render(<SessionChart slice={late} />)
+    const node = [...container.querySelectorAll('text')].find((n) =>
+      n.textContent?.startsWith('your brief'),
+    )!
+    expect(node.getAttribute('text-anchor')).toBe('end')
+  })
+
+  it('spaces candles by their real sampling interval, not by array position', () => {
+    const { container } = render(<SessionChart slice={slice()} />)
+    const xs = [...container.querySelectorAll('rect')].map((r) => Number(r.getAttribute('x')))
+    const gaps = xs.slice(1).map((x, i) => x - xs[i])
+    // 15-minute bars are evenly sampled, so their spacing must be even too.
+    expect(Math.abs(gaps[0] - gaps[1])).toBeLessThan(0.01)
+  })
+
   it('survives a dead-flat session without dividing by zero', () => {
     const flat = slice({
       bars: [bar('2026-09-11T03:45:00.000Z', 100, 100)],
