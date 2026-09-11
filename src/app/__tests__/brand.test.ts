@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -53,6 +53,21 @@ describe('brand constraints', () => {
 
   it('defines a light theme override', () => {
     expect(readFileSync(path.join(SRC, 'app/globals.css'), 'utf8')).toContain("[data-theme='light']")
+  })
+
+  it('ships a logo for each theme, and references both', () => {
+    for (const file of ['logo-light.png', 'logo-dark.png']) {
+      expect(existsSync(path.join(process.cwd(), 'public', file))).toBe(true)
+    }
+    const logo = readFileSync(path.join(SRC, 'components/ui/Logo.tsx'), 'utf8')
+    expect(logo).toContain('/logo-light.png')
+    expect(logo).toContain('/logo-dark.png')
+  })
+
+  it('swaps the logo in CSS, so the right one is painted first time', () => {
+    const css = readFileSync(path.join(SRC, 'app/globals.css'), 'utf8')
+    expect(css).toContain('.bb-logo-light')
+    expect(css).toContain('.bb-logo-dark')
   })
 
   it('respects prefers-reduced-motion', () => {

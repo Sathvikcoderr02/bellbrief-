@@ -1,6 +1,7 @@
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { EXCHANGES } from '@/lib/markets'
 
 const session = { userId: '' }
 
@@ -93,8 +94,11 @@ describe('POST /api/onboarding', () => {
     expect((await post({ ...valid, experienceLevel: 'wizard' })).status).toBe(400)
   })
 
-  it('caps the number of exchanges', async () => {
-    expect((await post({ ...valid, exchanges: ['NSE', 'BSE', 'NASDAQ', 'NYSE', 'LSE'] })).status).toBe(400)
+  it('accepts every supported exchange at once, with no upper cap', async () => {
+    const all = EXCHANGES.map((exchange) => exchange.code)
+    expect(all.length).toBeGreaterThan(4)
+    expect((await post({ ...valid, exchanges: all })).status).toBe(200)
+    expect((await ProfileModel.findOne({ userId: session.userId }).lean())!.exchanges).toEqual(all)
   })
 
   it('rejects an unauthenticated request', async () => {

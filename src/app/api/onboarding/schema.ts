@@ -13,7 +13,6 @@ export const profileInputSchema = z
     exchanges: z
       .array(z.string())
       .min(1, 'Pick at least one exchange')
-      .max(4, 'Four exchanges is the maximum')
       .refine((codes) => codes.every(isSupportedExchange), 'That exchange is not supported'),
     sectors: z.array(z.enum(sectorIds)).max(SECTORS.length).default([]),
     tickers: z.array(z.string().min(1).max(20)).max(25).default([]),
