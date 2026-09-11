@@ -50,6 +50,11 @@ export function nextSessionOpen(
   throw new Error(`No trading day found for ${exchange.code} within 400 days`)
 }
 
+/** The opening bell for one named session, as an absolute instant. */
+export function openInstantFor(exchange: Exchange, sessionDate: string): Date {
+  return openOn(exchange, sessionDate).toJSDate()
+}
+
 export function digestInstantFor(exchange: Exchange, sessionDate: string): Date {
   return openOn(exchange, sessionDate).minus({ minutes: DIGEST_LEAD_MINUTES }).toJSDate()
 }

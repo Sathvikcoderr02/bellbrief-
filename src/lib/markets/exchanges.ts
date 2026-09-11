@@ -12,6 +12,10 @@ export interface Exchange {
   /** 'YYYY-MM-DD' dates, exchange-local. */
   holidays: string[]
   currency: string
+  /** Yahoo Finance symbol for this market's headline index. */
+  indexSymbol: string
+  /** Display name of that index. */
+  indexName: string
 }
 
 const MON_FRI = [1, 2, 3, 4, 5]
@@ -38,23 +42,23 @@ const IN_HOLIDAYS = [
  * missing holiday entry never causes a *missed* brief on a real trading day.
  */
 export const EXCHANGES: Exchange[] = [
-  { code: 'NASDAQ', label: 'NASDAQ — United States', region: 'us', timeZone: 'America/New_York', openLocal: '09:30', tradingDays: MON_FRI, holidays: US_HOLIDAYS, currency: 'USD' },
-  { code: 'NYSE', label: 'NYSE — United States', region: 'us', timeZone: 'America/New_York', openLocal: '09:30', tradingDays: MON_FRI, holidays: US_HOLIDAYS, currency: 'USD' },
-  { code: 'NSE', label: 'NSE — India', region: 'in', timeZone: 'Asia/Kolkata', openLocal: '09:15', tradingDays: MON_FRI, holidays: IN_HOLIDAYS, currency: 'INR' },
-  { code: 'BSE', label: 'BSE — India', region: 'in', timeZone: 'Asia/Kolkata', openLocal: '09:15', tradingDays: MON_FRI, holidays: IN_HOLIDAYS, currency: 'INR' },
-  { code: 'LSE', label: 'London Stock Exchange', region: 'uk', timeZone: 'Europe/London', openLocal: '08:00', tradingDays: MON_FRI, currency: 'GBP',
+  { code: 'NASDAQ', label: 'NASDAQ — United States', region: 'us', timeZone: 'America/New_York', openLocal: '09:30', tradingDays: MON_FRI, holidays: US_HOLIDAYS, currency: 'USD', indexSymbol: '^IXIC', indexName: 'NASDAQ Composite' },
+  { code: 'NYSE', label: 'NYSE — United States', region: 'us', timeZone: 'America/New_York', openLocal: '09:30', tradingDays: MON_FRI, holidays: US_HOLIDAYS, currency: 'USD', indexSymbol: '^GSPC', indexName: 'S&P 500' },
+  { code: 'NSE', label: 'NSE — India', region: 'in', timeZone: 'Asia/Kolkata', openLocal: '09:15', tradingDays: MON_FRI, holidays: IN_HOLIDAYS, currency: 'INR', indexSymbol: '^NSEI', indexName: 'NIFTY 50' },
+  { code: 'BSE', label: 'BSE — India', region: 'in', timeZone: 'Asia/Kolkata', openLocal: '09:15', tradingDays: MON_FRI, holidays: IN_HOLIDAYS, currency: 'INR', indexSymbol: '^BSESN', indexName: 'SENSEX' },
+  { code: 'LSE', label: 'London Stock Exchange', region: 'uk', timeZone: 'Europe/London', openLocal: '08:00', tradingDays: MON_FRI, currency: 'GBP', indexSymbol: '^FTSE', indexName: 'FTSE 100',
     holidays: ['2026-01-01', '2026-04-03', '2026-04-06', '2026-05-04', '2026-05-25', '2026-08-31', '2026-12-25', '2026-12-28', '2027-01-01', '2027-03-26', '2027-03-29', '2027-05-03', '2027-05-31', '2027-08-30', '2027-12-27', '2027-12-28'] },
-  { code: 'XETRA', label: 'Frankfurt — XETRA', region: 'eu', timeZone: 'Europe/Berlin', openLocal: '09:00', tradingDays: MON_FRI, currency: 'EUR',
+  { code: 'XETRA', label: 'Frankfurt — XETRA', region: 'eu', timeZone: 'Europe/Berlin', openLocal: '09:00', tradingDays: MON_FRI, currency: 'EUR', indexSymbol: '^GDAXI', indexName: 'DAX',
     holidays: ['2026-01-01', '2026-04-03', '2026-04-06', '2026-05-01', '2026-12-24', '2026-12-25', '2026-12-31', '2027-01-01', '2027-03-26', '2027-03-29', '2027-12-24', '2027-12-31'] },
-  { code: 'EURONEXT_PARIS', label: 'Euronext Paris', region: 'eu', timeZone: 'Europe/Paris', openLocal: '09:00', tradingDays: MON_FRI, currency: 'EUR',
+  { code: 'EURONEXT_PARIS', label: 'Euronext Paris', region: 'eu', timeZone: 'Europe/Paris', openLocal: '09:00', tradingDays: MON_FRI, currency: 'EUR', indexSymbol: '^FCHI', indexName: 'CAC 40',
     holidays: ['2026-01-01', '2026-04-03', '2026-04-06', '2026-05-01', '2026-12-25', '2027-01-01', '2027-03-26', '2027-03-29', '2027-12-24'] },
-  { code: 'TSE', label: 'Tokyo Stock Exchange', region: 'jp', timeZone: 'Asia/Tokyo', openLocal: '09:00', tradingDays: MON_FRI, currency: 'JPY',
+  { code: 'TSE', label: 'Tokyo Stock Exchange', region: 'jp', timeZone: 'Asia/Tokyo', openLocal: '09:00', tradingDays: MON_FRI, currency: 'JPY', indexSymbol: '^N225', indexName: 'Nikkei 225',
     holidays: ['2026-01-01', '2026-01-02', '2026-01-12', '2026-02-11', '2026-05-04', '2026-05-05', '2026-12-31', '2027-01-01'] },
-  { code: 'HKEX', label: 'Hong Kong Exchange', region: 'hk', timeZone: 'Asia/Hong_Kong', openLocal: '09:30', tradingDays: MON_FRI, currency: 'HKD',
+  { code: 'HKEX', label: 'Hong Kong Exchange', region: 'hk', timeZone: 'Asia/Hong_Kong', openLocal: '09:30', tradingDays: MON_FRI, currency: 'HKD', indexSymbol: '^HSI', indexName: 'Hang Seng',
     holidays: ['2026-01-01', '2026-04-03', '2026-05-01', '2026-10-01', '2026-12-25', '2027-01-01'] },
-  { code: 'ASX', label: 'Australian Securities Exchange', region: 'au', timeZone: 'Australia/Sydney', openLocal: '10:00', tradingDays: MON_FRI, currency: 'AUD',
+  { code: 'ASX', label: 'Australian Securities Exchange', region: 'au', timeZone: 'Australia/Sydney', openLocal: '10:00', tradingDays: MON_FRI, currency: 'AUD', indexSymbol: '^AXJO', indexName: 'ASX 200',
     holidays: ['2026-01-01', '2026-01-26', '2026-04-03', '2026-04-06', '2026-04-27', '2026-12-25', '2026-12-28', '2027-01-01'] },
-  { code: 'TSX', label: 'Toronto Stock Exchange', region: 'ca', timeZone: 'America/Toronto', openLocal: '09:30', tradingDays: MON_FRI, currency: 'CAD',
+  { code: 'TSX', label: 'Toronto Stock Exchange', region: 'ca', timeZone: 'America/Toronto', openLocal: '09:30', tradingDays: MON_FRI, currency: 'CAD', indexSymbol: '^GSPTSE', indexName: 'S&P/TSX Composite',
     holidays: ['2026-01-01', '2026-02-16', '2026-04-03', '2026-05-18', '2026-07-01', '2026-09-07', '2026-10-12', '2026-12-25', '2026-12-28'] },
 ]
 

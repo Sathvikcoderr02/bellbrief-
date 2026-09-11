@@ -27,6 +27,11 @@
   --bb-claim-disputed: #ffc24b;
   --bb-claim-discarded: #5c6b64;
 
+  /* Candle polarity. Dark clears deuteranopia on the lightness gap alone
+     (ΔE 21.8): lime is far lighter than the red. */
+  --bb-up: #a8ff60;
+  --bb-down: #ff5c5c;
+
   --bb-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
   --bb-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
@@ -58,6 +63,12 @@
   --bb-claim-disputed: #c98400;
   --bb-claim-discarded: #aab7b0;
 
+  /* Not the theme's accent/red: those two score ΔE 0.7 under deuteranopia on
+     white — a red-green reader cannot tell an up candle from a down one. A
+     lighter green against a darker red clears it at 21.1, both still >= 3:1. */
+  --bb-up: #4aa32b;
+  --bb-down: #8e1616;
+
   color-scheme: light;
 }
 
@@ -78,6 +89,8 @@
   --color-bb-claim-single: var(--bb-claim-single);
   --color-bb-claim-disputed: var(--bb-claim-disputed);
   --color-bb-claim-discarded: var(--bb-claim-discarded);
+  --color-bb-up: var(--bb-up);
+  --color-bb-down: var(--bb-down);
   --font-mono: var(--bb-mono);
   --font-sans: var(--bb-sans);
 }

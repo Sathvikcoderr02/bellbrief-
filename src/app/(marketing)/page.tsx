@@ -6,8 +6,11 @@ import { Panel } from '@/components/ui/Panel'
 import { Reveal } from '@/components/ui/Reveal'
 import { Stagger, StaggerItem } from '@/components/ui/Stagger'
 import { EXCHANGES, getExchange, nextBellGroups, nextDistinctBells } from '@/lib/markets'
+import { sliceLatestSession, type SessionSlice } from '@/lib/market/session'
+import { fetchIntraday } from '@/lib/market/yahoo'
 import { SECTORS, THEMES } from '@/lib/news'
 import { BellTimeline } from '@/components/charts/BellTimeline'
+import { SessionChart } from '@/components/charts/SessionChart'
 import { LandingCountdown } from '@/components/LandingCountdown'
 
 /**
@@ -59,9 +62,34 @@ const PIPELINE = [
   },
 ]
 
-export default function LandingPage() {
+/**
+ * The headline index of whichever market opens next, falling back to New York.
+ *
+ * Yahoo's chart endpoint is undocumented and can fail or change shape without
+ * notice, so every failure returns null and the section simply does not render.
+ * There is no placeholder series: a chart of invented prices would be worse
+ * than no chart.
+ */
+async function loadSession(): Promise<SessionSlice | null> {
+  const nextCode = nextBellGroups()[0]?.members[0]?.code
+  const candidates = [...new Set([nextCode, 'NYSE'].filter(Boolean) as string[])]
+
+  for (const code of candidates) {
+    try {
+      const exchange = getExchange(code)
+      const slice = sliceLatestSession(await fetchIntraday(exchange.indexSymbol), exchange)
+      if (slice) return slice
+    } catch {
+      // Try the next candidate; never fabricate a series.
+    }
+  }
+  return null
+}
+
+export default async function LandingPage() {
   const markets = nextDistinctBells(3)
   const bells = nextBellGroups()
+  const session = await loadSession()
 
   return (
     <main className="relative overflow-hidden">
@@ -138,6 +166,35 @@ export default function LandingPage() {
           <LandingCountdown markets={markets} />
         </Reveal>
       </section>
+
+      {session ? (
+        <section className="relative mx-auto max-w-6xl px-5 pb-16 sm:px-6 md:pb-20">
+          <Reveal>
+            <Panel className="p-5 sm:p-6 md:p-8">
+              <p className="bb-label">What the hour is worth</p>
+              <h2 className="mt-3 max-w-2xl text-xl font-semibold leading-tight text-bb-bright sm:text-2xl">
+                The overnight news is already in the opening print.
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-bb-muted">
+                A market does not open where it closed. Everything published while the exchange slept
+                arrives at once, in the first candle — the jump from the dashed line below. Bellbrief
+                puts that news in front of you sixty minutes earlier, so the gap is something you
+                understood rather than something that happened to you.
+              </p>
+
+              <div className="mt-7">
+                <SessionChart slice={session} />
+              </div>
+
+              <p className="mt-5 text-[11px] leading-relaxed text-bb-faint">
+                Real prices for {session.name} from Yahoo Finance, {session.sessionDate} session, shown
+                to illustrate when the brief arrives relative to the bell. Past prices are not a
+                forecast, and nothing here is investment advice.
+              </p>
+            </Panel>
+          </Reveal>
+        </section>
+      ) : null}
 
       <section className="relative mx-auto max-w-6xl px-5 pb-16 sm:px-6 md:pb-20">
         <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
