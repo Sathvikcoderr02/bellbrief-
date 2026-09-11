@@ -64,6 +64,12 @@ describe('brand constraints', () => {
     expect(logo).toContain('/logo-dark.png')
   })
 
+  it('ships the favicon set Next resolves by convention', () => {
+    for (const file of ['favicon.ico', 'icon.png', 'apple-icon.png']) {
+      expect(existsSync(path.join(SRC, 'app', file))).toBe(true)
+    }
+  })
+
   it('swaps the logo in CSS, so the right one is painted first time', () => {
     const css = readFileSync(path.join(SRC, 'app/globals.css'), 'utf8')
     expect(css).toContain('.bb-logo-light')
