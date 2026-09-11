@@ -25,7 +25,7 @@ export default async function DigestPage({ params }: { params: Promise<{ id: str
 
   return (
     <AppShell>
-      <Panel className="p-6 md:p-8">
+      <Panel className="p-5 sm:p-6 md:p-8">
         <DigestView digest={toDigestViewModel(digest)} />
       </Panel>
     </AppShell>

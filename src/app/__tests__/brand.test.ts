@@ -76,6 +76,21 @@ describe('brand constraints', () => {
     expect(css).toContain('.bb-logo-dark')
   })
 
+  it('declares a mobile viewport', () => {
+    const layout = readFileSync(path.join(SRC, 'app/layout.tsx'), 'utf8')
+    expect(layout).toContain('export const viewport')
+    expect(layout).toContain("width: 'device-width'")
+  })
+
+  it('stops looping animations under reduced motion rather than only shortening them', () => {
+    const css = readFileSync(path.join(SRC, 'app/globals.css'), 'utf8')
+    const reduced = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'))
+    // A zeroed duration on an infinite blink is a strobe, not a stop.
+    expect(reduced).toContain('.bb-caret')
+    expect(reduced).toContain('.bb-scan')
+    expect(reduced).toContain('animation: none')
+  })
+
   it('respects prefers-reduced-motion', () => {
     expect(readFileSync(path.join(SRC, 'app/globals.css'), 'utf8')).toContain('prefers-reduced-motion')
   })

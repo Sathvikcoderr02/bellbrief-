@@ -4,7 +4,7 @@ import { Panel } from '@/components/ui/Panel'
 import { getSessionUser } from '@/lib/auth/server'
 import { connectToDatabase } from '@/lib/db/connect'
 import { ProfileModel } from '@/lib/db/models'
-import { EXCHANGES } from '@/lib/markets'
+import { displayZone, EXCHANGES } from '@/lib/markets'
 import { POPULAR_TICKERS, SECTORS, THEMES } from '@/lib/news'
 import { SettingsForm } from '@/components/SettingsForm'
 
@@ -21,13 +21,15 @@ export default async function SettingsPage() {
   return (
     <AppShell>
       <p className="bb-label">Settings</p>
-      <h1 className="mt-3 text-2xl font-semibold tracking-tight text-bb-bright">What we watch for you</h1>
+      <h1 className="mt-3 text-xl font-semibold tracking-tight text-bb-bright sm:text-2xl">
+        What we watch for you
+      </h1>
       <p className="mt-2 text-sm text-bb-muted">
-        Signed in as {user.email} &middot; timezone {user.timeZone}, detected from your browser and used for
+        Signed in as {user.email} &middot; timezone {displayZone(user.timeZone)}, detected from your browser and used for
         every time shown in the app.
       </p>
 
-      <Panel className="mt-7 p-6 md:p-8">
+      <Panel className="mt-6 p-5 sm:mt-7 sm:p-6 md:p-8">
         <SettingsForm
           initial={{
             exchanges: profile.exchanges,

@@ -1,16 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { safeNextPath } from '@/lib/auth/nextPath'
 import { Button } from '@/components/ui/Button'
 import { Field } from '@/components/ui/Field'
 import { Logo } from '@/components/ui/Logo'
 import { Panel } from '@/components/ui/Panel'
 
-export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
+export function AuthForm({ mode, next }: { mode: 'login' | 'register'; next?: string }) {
   const router = useRouter()
-  const next = useSearchParams().get('next')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -46,15 +46,15 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
       setError(body.error ?? 'Something went wrong. Try again.')
       return
     }
-    router.push(isRegister ? '/onboarding' : (next ?? '/dashboard'))
+    router.push(isRegister ? '/onboarding' : safeNextPath(next))
   }
 
   return (
-    <main className="relative flex min-h-dvh items-center justify-center px-6 py-12">
+    <main className="relative flex min-h-dvh items-center justify-center px-5 py-10 sm:px-6 sm:py-12">
       <div className="bb-grid-bg pointer-events-none absolute inset-0 opacity-30" aria-hidden />
 
-      <Panel className="relative w-full max-w-md p-8">
-        <Link href="/">
+      <Panel className="relative w-full max-w-md p-6 sm:p-8">
+        <Link href="/" className="inline-flex min-h-11 items-center">
           <Logo />
         </Link>
 
@@ -93,14 +93,17 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
             </p>
           ) : null}
 
-          <Button type="submit" disabled={busy} className="w-full">
+          <Button type="submit" disabled={busy} className="min-h-12 w-full">
             {busy ? 'Working…' : isRegister ? 'Create account' : 'Sign in'}
           </Button>
         </form>
 
         <p className="mt-6 text-center text-xs text-bb-muted">
           {isRegister ? 'Already have an account? ' : 'No account yet? '}
-          <Link href={isRegister ? '/login' : '/register'} className="text-bb-accent hover:underline">
+          <Link
+            href={isRegister ? '/login' : '/register'}
+            className="text-bb-accent hover:underline"
+          >
             {isRegister ? 'Sign in' : 'Create one'}
           </Link>
         </p>

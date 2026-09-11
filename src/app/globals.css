@@ -94,6 +94,41 @@ body {
   background-size: 48px 48px;
 }
 
+/* Landing-page motion. The blanket reduced-motion rule at the end of this file
+   zeroes animation *durations*, which for an infinite blink would mean a strobe
+   rather than a stop — so both of these are switched off explicitly there. */
+@keyframes bb-caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.bb-caret {
+  animation: bb-caret 1.15s steps(1, end) infinite;
+}
+
+/* A slow scanline. Animating `transform` keeps this on the compositor; drifting
+   the hairline grid's background-position instead would repaint the viewport
+   every frame, which is felt on a phone. */
+@keyframes bb-scan {
+  from {
+    transform: translateY(-150%);
+  }
+  to {
+    transform: translateY(150%);
+  }
+}
+
+.bb-scan {
+  animation: bb-scan 9s linear infinite;
+  will-change: transform;
+}
+
 /* The logo ships as two files and CSS chooses, so the correct one is painted
    on the first frame. Dark is the default because :root is the dark theme. */
 .bb-logo-light {
@@ -120,6 +155,15 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .bb-caret,
+  .bb-scan {
+    animation: none !important;
+  }
+
+  .bb-caret {
+    opacity: 1;
+  }
+
   *,
   *::before,
   *::after {

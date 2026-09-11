@@ -9,7 +9,13 @@ import { getSessionUser } from '@/lib/auth/server'
 import { connectToDatabase } from '@/lib/db/connect'
 import { DigestModel, ProfileModel } from '@/lib/db/models'
 import { toDigestViewModel } from '@/lib/digest'
-import { DIGEST_LEAD_MINUTES, getExchange, nextSessionOpen } from '@/lib/markets'
+import {
+  DIGEST_LEAD_MINUTES,
+  displayZone,
+  getExchange,
+  isSameZone,
+  nextSessionOpen,
+} from '@/lib/markets'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,67 +36,75 @@ export default async function DashboardPage() {
     .lean()
 
   // The same instant, rendered twice: once on the reader's clock, once on the
-  // exchange's. That contrast is the whole product promise made visible.
+  // exchange's. That contrast is the whole product promise made visible — but
+  // only when the two actually differ.
   const inUserZone = (date: Date) => DateTime.fromJSDate(date).setZone(user.timeZone).toFormat('HH:mm')
-  const inExchangeZone = (date: Date) => DateTime.fromJSDate(date).setZone(primary.timeZone).toFormat('HH:mm')
+  const inExchangeZone = (date: Date) =>
+    DateTime.fromJSDate(date).setZone(primary.timeZone).toFormat('HH:mm')
+
+  const userZone = displayZone(user.timeZone)
+  const openAt = `one hour before the ${inExchangeZone(openInstant)} open on ${sessionDate}`
+  const sublabel = isSameZone(user.timeZone, primary.timeZone)
+    ? `Lands ${inUserZone(digestInstant)} (${userZone}), ${openAt}.`
+    : `Lands ${inUserZone(digestInstant)} your time (${userZone}) — that is ${inExchangeZone(digestInstant)} in ${displayZone(primary.timeZone)}, ${openAt}.`
+
+  const rows: [string, string][] = [
+    ['Exchanges', profile.exchanges.join(', ')],
+    ['Tickers', profile.tickers.length > 0 ? profile.tickers.join(', ') : '—'],
+    ['Sectors', String(profile.sectors.length || '—')],
+    ['Themes', String(profile.themes.length || '—')],
+    ['Written for', profile.experienceLevel],
+    ['Email', profile.emailOptIn ? 'on' : 'off'],
+  ]
 
   return (
     <AppShell>
-      <div className="grid gap-4 md:grid-cols-[1.15fr_1fr]">
-        <Panel className="p-6">
+      <div className="grid gap-3 sm:gap-4 md:grid-cols-[1.15fr_1fr]">
+        <Panel className="p-5 sm:p-6">
           <Countdown
             targetIso={digestInstant.toISOString()}
             label={`Next brief · ${primary.code}`}
-            sublabel={`Lands ${inUserZone(digestInstant)} your time (${user.timeZone}) — that is ${inExchangeZone(digestInstant)} in ${primary.timeZone}, one hour before the ${inExchangeZone(openInstant)} open on ${sessionDate}.`}
+            sublabel={sublabel}
           />
         </Panel>
 
-        <Panel className="p-6">
+        <Panel className="p-5 sm:p-6">
           <p className="bb-label">Your profile</p>
-          <dl className="mt-4 space-y-2.5 text-[13px]">
-            <div className="flex justify-between gap-4">
-              <dt className="text-bb-muted">Exchanges</dt>
-              <dd className="text-right text-bb-text">{profile.exchanges.join(', ')}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-bb-muted">Tickers</dt>
-              <dd className="text-right text-bb-text">
-                {profile.tickers.length > 0 ? profile.tickers.join(', ') : '—'}
-              </dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-bb-muted">Sectors</dt>
-              <dd className="text-right text-bb-text">{profile.sectors.length || '—'}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-bb-muted">Themes</dt>
-              <dd className="text-right text-bb-text">{profile.themes.length || '—'}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-bb-muted">Written for</dt>
-              <dd className="text-right text-bb-text">{profile.experienceLevel}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-bb-muted">Email</dt>
-              <dd className="text-right text-bb-text">{profile.emailOptIn ? 'on' : 'off'}</dd>
-            </div>
+          <dl className="mt-4 space-y-3 text-[13px] sm:space-y-2.5">
+            {rows.map(([label, value]) => (
+              // Stacked on a phone: a long exchange list squeezes the label to
+              // nothing when the two share a row.
+              <div
+                key={label}
+                className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"
+              >
+                <dt className="text-bb-muted">{label}</dt>
+                <dd className="break-words text-bb-text sm:text-right">{value}</dd>
+              </div>
+            ))}
           </dl>
-          <Link href="/settings" className="bb-label mt-5 inline-block transition-colors hover:text-bb-accent">
+          <Link
+            href="/settings"
+            className="bb-label mt-5 inline-flex min-h-11 items-center transition-colors hover:text-bb-accent"
+          >
             EDIT →
           </Link>
         </Panel>
       </div>
 
-      <Panel className="mt-4 p-6 md:p-8">
+      <Panel className="mt-3 p-5 sm:mt-4 sm:p-6 md:p-8">
         {latest ? (
           <DigestView digest={toDigestViewModel(latest)} />
         ) : (
           <div className="py-10 text-center">
             <p className="bb-label">No brief yet</p>
-            <h2 className="mt-3 text-xl font-semibold text-bb-bright">Your first brief is scheduled</h2>
+            <h2 className="mt-3 text-lg font-semibold text-bb-bright sm:text-xl">
+              Your first brief is scheduled
+            </h2>
             <p className="mx-auto mt-2.5 max-w-md text-sm leading-relaxed text-bb-muted">
-              It will appear here at {inUserZone(digestInstant)} your time on {sessionDate}, one hour before{' '}
-              {primary.code} opens{profile.emailOptIn ? ', and we will email it to you at the same moment' : ''}.
+              It will appear here at {inUserZone(digestInstant)} your time on {sessionDate}, one hour
+              before {primary.code} opens
+              {profile.emailOptIn ? ', and we will email it to you at the same moment' : ''}.
             </p>
           </div>
         )}

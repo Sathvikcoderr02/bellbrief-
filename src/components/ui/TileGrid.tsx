@@ -25,13 +25,13 @@ export function TileGrid({
   columns?: 2 | 3 | 4
 }) {
   const grid = {
-    2: 'sm:grid-cols-2',
-    3: 'sm:grid-cols-2 lg:grid-cols-3',
+    2: 'grid-cols-1 sm:grid-cols-2',
+    3: 'grid-cols-2 lg:grid-cols-3',
     4: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4',
   }[columns]
 
   return (
-    <div className={`grid grid-cols-1 gap-2.5 ${grid}`}>
+    <div className={`grid gap-2 sm:gap-2.5 ${grid}`}>
       {options.map((option, index) => {
         const active = selected.includes(option.id)
         return (
@@ -46,17 +46,21 @@ export function TileGrid({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.28, delay: Math.min(index * 0.022, 0.4) }}
             whileTap={{ scale: 0.98 }}
-            className={`relative flex flex-col items-start gap-1 rounded-xl border px-4 py-3.5 pr-9 text-left transition-colors ${
+            className={`relative flex min-h-16 flex-col items-start gap-1 rounded-xl border px-3 py-3 pr-8 text-left transition-colors sm:px-4 sm:py-3.5 sm:pr-9 ${
               active ? 'border-bb-accent bg-bb-accent-dim' : 'border-bb-border bg-bb-panel hover:border-bb-muted'
             }`}
           >
-            <span className={`text-sm font-medium ${active ? 'text-bb-accent' : 'text-bb-text'}`}>
+            <span
+              className={`text-[13px] font-medium leading-snug sm:text-sm ${
+                active ? 'text-bb-accent' : 'text-bb-text'
+              }`}
+            >
               {option.label}
             </span>
             {option.sub ? <span className="text-[11px] leading-tight text-bb-faint">{option.sub}</span> : null}
             <span
               aria-hidden
-              className={`absolute right-3.5 top-3.5 grid h-4 w-4 place-items-center rounded-[5px] border text-[10px] leading-none transition-colors ${
+              className={`absolute right-2.5 top-3 grid h-4 w-4 place-items-center rounded-[5px] border text-[10px] leading-none transition-colors sm:right-3.5 sm:top-3.5 ${
                 active ? 'border-bb-accent bg-bb-accent text-bb-bg' : 'border-bb-border text-transparent'
               }`}
             >

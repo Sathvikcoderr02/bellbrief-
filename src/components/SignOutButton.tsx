@@ -7,7 +7,7 @@ export function SignOutButton() {
         await fetch('/api/auth/logout', { method: 'POST' })
         window.location.href = '/'
       }}
-      className="bb-label transition-colors hover:text-bb-red"
+      className="bb-label inline-flex min-h-11 items-center rounded-lg px-2 transition-colors hover:text-bb-red"
     >
       SIGN OUT
     </button>

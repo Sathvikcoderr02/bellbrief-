@@ -46,7 +46,7 @@ export function DigestView({ digest }: { digest: DigestViewModel }) {
         <span className={`bb-label ${SENTIMENT_TONE[digest.sentiment] ?? 'text-bb-muted'}`}>{digest.sentiment}</span>
       </div>
 
-      <h1 className="mt-4 text-2xl font-semibold leading-tight tracking-tight text-bb-bright md:text-3xl">
+      <h1 className="mt-4 text-xl font-semibold leading-tight tracking-tight text-bb-bright sm:text-2xl md:text-3xl">
         {digest.headline}
       </h1>
       {digest.overview ? <p className="mt-3 text-sm leading-relaxed text-bb-muted">{digest.overview}</p> : null}
@@ -73,7 +73,7 @@ export function DigestView({ digest }: { digest: DigestViewModel }) {
             role="tab"
             aria-selected={tab === id}
             onClick={() => setTab(id)}
-            className={`relative px-4 py-2.5 text-[13px] transition-colors ${
+            className={`relative inline-flex min-h-11 items-center px-3.5 text-[13px] transition-colors sm:px-4 ${
               tab === id ? 'text-bb-accent' : 'text-bb-muted hover:text-bb-text'
             }`}
           >

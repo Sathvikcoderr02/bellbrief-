@@ -29,7 +29,7 @@ export function Countdown({
     <div>
       <p className="bb-label">{label}</p>
       <p
-        className={`bb-num mt-2 text-4xl tracking-tight md:text-5xl ${done ? 'text-bb-muted' : 'text-bb-accent'}`}
+        className={`bb-num mt-2 text-3xl tracking-tight sm:text-4xl md:text-5xl ${done ? 'text-bb-muted' : 'text-bb-accent'}`}
         suppressHydrationWarning
       >
         {remaining === null

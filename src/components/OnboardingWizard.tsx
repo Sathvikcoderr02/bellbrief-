@@ -140,7 +140,7 @@ export function OnboardingWizard({ options }: { options: WizardOptions }) {
     <main className="relative min-h-dvh">
       <div className="bb-grid-bg pointer-events-none absolute inset-0 opacity-25" aria-hidden />
 
-      <div className="relative mx-auto max-w-3xl px-6 py-10">
+      <div className="relative mx-auto max-w-3xl px-5 pt-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6 sm:pt-10">
         <div className="flex items-center justify-between">
           <Logo />
           <span className="bb-num text-xs text-bb-faint">
@@ -173,7 +173,9 @@ export function OnboardingWizard({ options }: { options: WizardOptions }) {
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             className="mt-10"
           >
-            <h1 className="text-2xl font-semibold tracking-tight text-bb-bright md:text-3xl">{current.title}</h1>
+            <h1 className="text-xl font-semibold tracking-tight text-bb-bright sm:text-2xl md:text-3xl">
+              {current.title}
+            </h1>
             <p className="mt-2 text-sm text-bb-muted">{current.hint}</p>
             <div className="mt-7">{current.body}</div>
           </motion.div>
@@ -189,7 +191,7 @@ export function OnboardingWizard({ options }: { options: WizardOptions }) {
           <p className="mt-6 text-xs text-bb-amber">{current.invalidMessage}</p>
         ) : null}
 
-        <div className="mt-9 flex items-center justify-between border-t border-bb-border pt-6">
+        <div className="mt-8 flex items-center justify-between gap-3 border-t border-bb-border pt-5 sm:mt-9 sm:pt-6">
           <Button variant="quiet" onClick={() => setStep((value) => Math.max(0, value - 1))} disabled={step === 0}>
             Back
           </Button>

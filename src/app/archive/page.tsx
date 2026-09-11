@@ -29,11 +29,11 @@ export default async function ArchivePage() {
   return (
     <AppShell>
       <p className="bb-label">Archive · {digests.length} briefs</p>
-      <h1 className="mt-3 text-2xl font-semibold tracking-tight text-bb-bright">
+      <h1 className="mt-3 text-xl font-semibold tracking-tight text-bb-bright sm:text-2xl">
         Every brief we have sent you
       </h1>
 
-      <div className="mt-7 space-y-2.5">
+      <div className="mt-6 space-y-2.5 sm:mt-7">
         {digests.length === 0 ? (
           <Panel className="p-10 text-center text-sm text-bb-muted">
             Nothing archived yet — your first brief is still ahead of you.
@@ -41,7 +41,7 @@ export default async function ArchivePage() {
         ) : (
           digests.map((digest) => (
             <Link key={String(digest._id)} href={`/digest/${digest._id}`} className="block">
-              <Panel className="p-5 transition-colors hover:border-bb-accent">
+              <Panel className="p-4 transition-colors hover:border-bb-accent sm:p-5">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <span className="bb-label">
                     {digest.exchange} &middot; {digest.sessionDate}
